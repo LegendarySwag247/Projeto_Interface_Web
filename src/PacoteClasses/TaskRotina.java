@@ -3,8 +3,8 @@ package PacoteClasses;
 // TAREFA ROTINA (QUE FAZ DIARIAMENTE)
 public class TaskRotina extends Task{
 
-    public TaskRotina(String titulo, String tipo, String concluido) {
-        super(titulo, tipo, concluido);
+    public TaskRotina(int id, String titulo, String tipo, String concluido) {
+        super(id, titulo, tipo, concluido);
     }
 
     @Override

@@ -30,6 +30,31 @@ public class Lista {
         return nome;
     }
     
+    public static int pegarIdTarefa(String titulo, String tipo, String concluido, String data_horario){
+        List<Task> tasks = Lista.ListarTask();
+        boolean achou = false;
+        int identidade = 0;
+        for(Task task : tasks){
+            if(task.getTitulo().equals(titulo) && task.getTipo().equals(tipo) && task.getConcluido().equals(concluido) && task.getHorario_Data().equals(data_horario) ){
+                achou = true;
+                identidade = task.getId();
+                break;
+            }
+        }
+        
+        if(achou){
+            return identidade;
+        }else{
+            return -1;
+        }
+    
+    }
+        
+    // Filtro para editar
+    public boolean FiltroEditar(Task task, int id, String titulo, String tipo){
+        return (task.getTitulo().equals(titulo) && task.getTipo().equals(tipo) && task.getId() == id);
+    }
+    
     //funcionalidades do programa
     public void editar( String velhoTitulo, String velhoTipo, String novoTitulo, String novoTipo, String concluido){
         for(Task task : tasks){
@@ -90,8 +115,8 @@ public class Lista {
                     continue;
                 }
                 String[] partes = linha.split(";");
-                int id = Integer.parseInt(partes[0]);// id da lista
-                String nome = partes[1]; // nome da lista.
+                int id = Integer.parseInt(partes[1]);// id da lista
+                String nome = partes[2]; // nome da lista.
                 //String titulo = partes[2];
                 
                 boolean jaExiste = false;
@@ -133,19 +158,20 @@ public class Lista {
                     continue;
                 }
                 String[] partes = linha.split(";");
-                int id = Integer.parseInt(partes[0]);// id da lista
-                String nome = partes[1]; // nome da lista.
-                String titulo = partes[2];
-                String tipo = partes[3];
-                String concluido = partes[4];
-                String horario_data = partes[5];
+                int taskId = Integer.parseInt(partes[0]);// tarefa id
+                int id = Integer.parseInt(partes[1]);// id da lista
+                String nome = partes[2]; // nome da lista.
+                String titulo = partes[3];
+                String tipo = partes[4];
+                String concluido = partes[5];
+                String horario_data = partes[6];
                 
                 
                 if(tipo.equals("COMPROMISSO")){
-                    Task task_c = new TaskCompromisso(titulo, tipo, concluido, horario_data);
+                    Task task_c = new TaskCompromisso(taskId ,titulo, tipo, concluido, horario_data);
                     Lista.adicionarTarefa(task_c);
                 }else{
-                    Task task_r = new TaskRotina(titulo, tipo, concluido);
+                    Task task_r = new TaskRotina(taskId ,titulo, tipo, concluido);
                     Lista.adicionarTarefa(task_r);
                 }
                 
@@ -170,12 +196,13 @@ public class Lista {
                     continue;
                 }
                 String[] partes = linha.split(";");
-                int id = Integer.parseInt(partes[0]);// id da lista
-                String nome = partes[1]; // nome da lista.
-                String titulo = partes[2];
-                String tipo = partes[3];
-                String concluido = partes[4];
-                String horario_data = partes[5];
+                //int taskId = Integer.parseInt(partes[0]);// id fa tarefa
+                int id = Integer.parseInt(partes[1]);// id da lista
+                String nome = partes[2]; // nome da lista.
+                String titulo = partes[3];
+                String tipo = partes[4];
+                String concluido = partes[5];
+                String horario_data = partes[6];
                 
                 if(id == lista_id && nome.equals(lista_nome)){
                     Inicial.adicionarRow(new Object[]{
@@ -261,8 +288,13 @@ public class Lista {
     }
     
     // Acrecentar Id no arquivo .csv
-    public static int adicionarId(){
-        String caminho = "./dados/usuario.csv"; // Caminho para o arquivo .csv
+    public static int adicionarId(String tipo){
+        String caminho;
+        if(tipo.equals("user")){
+            caminho = "./dados/usuario.csv"; // Caminho para o arquivo .csv
+        }else{
+            caminho = "./dados/tarefas.csv"; // Caminho para o arquivo .csv
+        }
         int maiorVal = -1;
         try{
             FileReader fileReader = new FileReader (caminho);

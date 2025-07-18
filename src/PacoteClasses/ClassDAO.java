@@ -56,13 +56,14 @@ public class ClassDAO {
     public int inserirListaTask(int lista_id,String lista_nome,Task task){
         int status;
         try{
-            ps = con.prepareStatement("INSERT INTO lista_tarefa (lista_id, nome_lista, titulo_tarefa, tipo_tarefa, concluido_tarefa, Horario_data) VALUES(?,?,?,?,?,?)");
-            ps.setInt(1, lista_id);
-            ps.setString(2, lista_nome);
-            ps.setString(3, task.getTitulo());
-            ps.setString(4, task.getTipo());
-            ps.setString(5, task.getConcluido());
-            ps.setString(6, task.getHorario_Data());
+            ps = con.prepareStatement("INSERT INTO lista_tarefa (id, lista_id, nome_lista, titulo_tarefa, tipo_tarefa, concluido_tarefa, Horario_data) VALUES(?,?,?,?,?,?,?)");
+            ps.setInt(1, task.getId());
+            ps.setInt(2, lista_id);
+            ps.setString(3, lista_nome);
+            ps.setString(4, task.getTitulo());
+            ps.setString(5, task.getTipo());
+            ps.setString(6, task.getConcluido());
+            ps.setString(7, task.getHorario_Data());
             status = ps.executeUpdate();
             return status;
         }catch(SQLException ex){
@@ -72,17 +73,15 @@ public class ClassDAO {
     }
     
     // Atualizar dados da Tarefa.
-    public int atualizarDadosTask(String lista_nome, String titulo_task, String tipo_task,Task task){
+    public int atualizarDadosTask(Task task){
         int status;
         try{
-            ps = con.prepareStatement("UPDATE lista_tarefa SET titulo_tarefa = ?, tipo_tarefa = ?, concluido_tarefa = ?, Horario_data = ? WHERE nome_lista = ? AND titulo_tarefa = ? AND tipo_tarefa = ?");
+            ps = con.prepareStatement("UPDATE lista_tarefa SET titulo_tarefa = ?, tipo_tarefa = ?, concluido_tarefa = ?, Horario_data = ? WHERE id = ?");
             ps.setString(1, task.getTitulo());
             ps.setString(2, task.getTipo());
             ps.setString(3, task.getConcluido());
             ps.setString(4, task.getHorario_Data());
-            ps.setString(5, lista_nome);
-            ps.setString(6, titulo_task);
-            ps.setString(7, tipo_task);
+            ps.setInt(5, task.getId());
             status = ps.executeUpdate();
             return status;
         }catch(SQLException ex){
@@ -93,11 +92,8 @@ public class ClassDAO {
     // Excluir dados da Tarefa.
     public boolean excluirDadosTask(Task task){
         try{
-            ps = con.prepareStatement("DELETE FROM lista_tarefa WHERE titulo_tarefa = ? AND tipo_tarefa = ? AND concluido_tarefa = ? AND Horario_data = ?");
-            ps.setString(1, task.getTitulo());
-            ps.setString(2, task.getTipo());
-            ps.setString(3, task.getConcluido());
-            ps.setString(4, task.getHorario_Data());
+            ps = con.prepareStatement("DELETE FROM lista_tarefa WHERE id = ?");
+            ps.setInt(1, task.getId());
             ps.executeUpdate();
             return true;
         }catch(SQLException ex){
@@ -170,23 +166,24 @@ public class ClassDAO {
                     }
                     
                     String[] partes = linha.split(";");
+                    int id = Integer.parseInt(partes[0]);
+                    int lista_id = Integer.parseInt(partes[1]);
+                    String lista_nome = partes[2];
+                    String task_titulo = partes[3];
+                    String task_tipo = partes[4];
+                    String task_concluido = partes[5];
+                    String task_Horario = partes[6];
                     
-                    int lista_id = Integer.parseInt(partes[0]);
-                    String lista_nome = partes[1];
-                    String task_titulo = partes[2];
-                    String task_tipo = partes[3];
-                    String task_concluido = partes[4];
-                    String task_Horario = partes[5];
-                    
-                    String sql = "INSERT INTO lista_tarefa(lista_id, nome_lista, titulo_tarefa, tipo_tarefa, concluido_tarefa, Horario_data) VALUES(?,?,?,?,?,?)";
+                    String sql = "INSERT INTO lista_tarefa(id, lista_id, nome_lista, titulo_tarefa, tipo_tarefa, concluido_tarefa, Horario_data) VALUES(?,?,?,?,?,?,?)";
                     
                     ps = con.prepareStatement(sql);
-                    ps.setInt(1, lista_id);
-                    ps.setString(2, lista_nome);
-                    ps.setString(3, task_titulo);
-                    ps.setString(4, task_tipo);
-                    ps.setString(5, task_concluido);
-                    ps.setString(6, task_Horario);
+                    ps.setInt(1, id);
+                    ps.setInt(2, lista_id);
+                    ps.setString(3, lista_nome);
+                    ps.setString(4, task_titulo);
+                    ps.setString(5, task_tipo);
+                    ps.setString(6, task_concluido);
+                    ps.setString(7, task_Horario);
                     
                     ps.executeUpdate();
                 }
@@ -252,16 +249,19 @@ public class ClassDAO {
                 ps = con.prepareStatement(sql);
                 re = ps.executeQuery();
                 
-                writer.write("Id;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
+                //writer.write("ListaId;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
+                writer.write("Id;ListaId;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
                 
                 while(re.next()){
+                    int id = re.getInt("id");
                     int lista_id = re.getInt("lista_id");
                     String lista_nome = re.getString("nome_lista");
                     String tarefa_titulo = re.getString("titulo_tarefa");
                     String tarefa_tipo = re.getString("tipo_tarefa");
                     String tarefa_concluido = re.getString("concluido_tarefa");
                     String horario = re.getString("Horario_data");
-                    writer.write(lista_id+ ";" + lista_nome + ";" + tarefa_titulo + ";" + tarefa_tipo + ";" + tarefa_concluido + ";"+ horario + "\n");           
+                    //writer.write(lista_id+ ";" + lista_nome + ";" + tarefa_titulo + ";" + tarefa_tipo + ";" + tarefa_concluido + ";"+ horario + "\n");           
+                    writer.write(id + ";" + lista_id + ";" + lista_nome + ";" + tarefa_titulo + ";" + tarefa_tipo + ";" + tarefa_concluido + ";" + horario + "\n");
                 }
             }
             writer.close();

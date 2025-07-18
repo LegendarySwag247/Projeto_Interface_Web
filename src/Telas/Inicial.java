@@ -394,7 +394,7 @@ public class Inicial extends javax.swing.JFrame {
             String titulo = table_tarefas.getValueAt(row, 0).toString();
             String tipo = table_tarefas.getValueAt(row, 1).toString();
             for (Lista lista : listas){
-                if(lista.getNome().equals(nome)){
+                if(lista.getNome().equals(nome) && lista.getId() == getUserId()){
                     for (Task task : tasks){
                         if(task.getTitulo().equals(titulo) && task.getTipo().equals(tipo)){
                             int res = JOptionPane.showConfirmDialog(null, "Tem certeza de que deseja deletar a tarefa?");
@@ -428,7 +428,6 @@ public class Inicial extends javax.swing.JFrame {
             if (list_lista.isSelectionEmpty()){
                 JOptionPane.showMessageDialog(null, "Por favor selecione uma das listas.");
             }else{
-                
                 int row = table_tarefas.getSelectedRow();
                 String opcao = table_tarefas.getValueAt(row, 2).toString();
                 String data_horario = table_tarefas.getValueAt(row, 3).toString();
@@ -437,7 +436,10 @@ public class Inicial extends javax.swing.JFrame {
                     l_name_select = list_lista.getSelectedValue();
                     colocar_Titulo(row);
                     colocar_Tipo(row);
-                    editar.abrir(editar, getUserId(),getListSelectedName(), get_Titulo(), get_tipo(), opcao, data_horario);
+                    
+                    int selectedId = Lista.pegarIdTarefa( get_Titulo(), get_tipo(), opcao, data_horario);
+                    
+                    editar.abrir(selectedId, editar, getUserId(),getListSelectedName(), get_Titulo(), get_tipo(), opcao, data_horario);
                 }else{
                     JOptionPane.showMessageDialog(null, "Por favor selecione uma linha da tabela.");
                 }

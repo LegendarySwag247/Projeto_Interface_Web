@@ -11,12 +11,18 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 
 public abstract class Task {
+    int id;
     private String titulo, tipo, concluido;
     
-    public Task(String titulo, String tipo, String concluido){
+    public Task(int id, String titulo, String tipo, String concluido){
+        this.id = id;
         this.titulo = titulo;
         this.tipo = tipo;
         this.concluido = concluido;
+    }
+    
+    public int getId(){
+        return id;
     }
     
     public String getTitulo() {
@@ -30,7 +36,11 @@ public abstract class Task {
     public String getConcluido(){
         return concluido;
     }
-
+    
+    public void setId(int id){
+        this.id = id;
+    }
+    
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
@@ -43,6 +53,10 @@ public abstract class Task {
         this.concluido = concluido;
     }
     
+    //para facilitar a filtracao
+    public boolean FiltrarDados(Lista lista, Task task, String Listanome, int taskId){
+        return(Listanome.equals(lista.getNome()) && task.getId() == taskId );
+    }
     // Excluir dados da lista
     public void exclirDados(String lista_nome, String _titulo, String _tipo){
         //List<Task> tasks = Lista.ListarTask();
@@ -63,9 +77,9 @@ public abstract class Task {
                 
                 String[] partes = linha.split(";");
                 //int id = Integer.parseInt(partes[0]);
-                String nome = partes[1];
-                String Listatitulo = partes[2];
-                String Listatipo = partes[3];
+                String nome = partes[2];
+                String Listatitulo = partes[3];
+                String Listatipo = partes[4];
                 
                 if(nome.equals(lista_nome) && Listatitulo.equals(_titulo) && Listatipo.equals(_tipo)){
                     encontrado = true;
@@ -89,7 +103,7 @@ public abstract class Task {
     }
     
     // Editar daods da lista
-    public void editarDados(String lista_nome, String velho_titulo, String velho_tipo, String novo_titulo, String novo_tipo, String opcao, String data){
+    public void editarDados(Lista lista, Task task, String novo_titulo, String novo_tipo, String opcao, String data){
         String caminho = "./dados/tarefas.csv"; // Caminho para o arquivo .csv
         StringBuilder conteudoAtualizado = new StringBuilder();
         boolean encontrado = false;
@@ -106,19 +120,21 @@ public abstract class Task {
                 }
                 
                 String[] partes = linha.split(";");
-                //int id = Integer.parseInt(partes[0]);
-                String Listanome = partes[1];
-                String Listatitulo = partes[2];
-                String Listatipo = partes[3];
-                
-                if(Listanome.equals(lista_nome) && Listatitulo.equals(velho_titulo) && Listatipo.equals(velho_tipo)){
+                int taskId = Integer.parseInt(partes[0]);
+                int id_lista = Integer.parseInt(partes[1]);
+                String Listanome = partes[2];
+                String Listatitulo = partes[3];
+                String Listatipo = partes[4];
+                //String Listaconcluido = partes[5];
+                //String DataHora = partes[6];
+                if(FiltrarDados(lista, task, Listanome, taskId)){
                     
                     encontrado = true;
                     
-                    partes[2] = novo_titulo;
-                    partes[3] = novo_tipo;
-                    partes[4] = opcao;
-                    partes[5] = data;
+                    partes[3] = novo_titulo;
+                    partes[4] = novo_tipo;
+                    partes[5] = opcao;
+                    partes[6] = data;
                     
                     conteudoAtualizado.append(String.join(";", partes)).append("\n");
                     
@@ -150,10 +166,11 @@ public abstract class Task {
             FileWriter fileWriter = new FileWriter(caminho ,StandardCharsets.ISO_8859_1, existe);
             
             if(existe == false){
-                fileWriter.write("Id;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
+                //fileWriter.write("Id;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
+                fileWriter.write("Id;ListaId;Lista;Titulo;Tipo;Concluido;Horario_e_data\n");
             }
             
-            fileWriter.write(list_id + ";" + lista_nome + ";" + task.getTitulo() + ";" + task.getTipo() + ";" + task.getConcluido() + ";" + task.getHorario_Data() + "\n");
+            fileWriter.write(task.getId() + ";" + list_id + ";" + lista_nome + ";" + task.getTitulo() + ";" + task.getTipo() + ";" + task.getConcluido() + ";" + task.getHorario_Data() + "\n");
             
             //writer.flush();
             

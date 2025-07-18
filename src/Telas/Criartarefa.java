@@ -192,10 +192,13 @@ public class Criartarefa extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Por favor preencha os dados da seguinte forma: 'hh:mm-dd/mm/aaaa' ");
         }else{
             JOptionPane.showMessageDialog(null, "Sua tarefa foi criado.");
+            
+            int identity = Lista.adicionarId("tarefa");
+            
             if(upper.equals("COMPROMISSO")){
-                task = new TaskCompromisso(txt_titulo,upper,concluido,txt_horario);
+                task = new TaskCompromisso(identity, txt_titulo,upper,concluido,txt_horario);
             }else{
-                task = new TaskRotina(txt_titulo, upper, concluido);
+                task = new TaskRotina(identity, txt_titulo, upper, concluido);
             }
             
             Lista.adicionarTarefa(task);

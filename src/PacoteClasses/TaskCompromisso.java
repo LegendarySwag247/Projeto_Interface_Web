@@ -5,8 +5,8 @@ public class TaskCompromisso extends Task {
     
     private String data_horario;
     
-    public TaskCompromisso(String titulo, String tipo,String concluido, String data_horario) {
-        super(titulo, tipo, concluido);
+    public TaskCompromisso(int id, String titulo, String tipo,String concluido, String data_horario) {
+        super(id, titulo, tipo, concluido);
         this.data_horario = data_horario;
     }
     

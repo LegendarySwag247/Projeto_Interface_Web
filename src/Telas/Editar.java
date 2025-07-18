@@ -2,15 +2,19 @@ package Telas;
 import PacoteClasses.ClassDAO;
 import PacoteClasses.Lista;
 import PacoteClasses.Task;
+import PacoteClasses.TaskCompromisso;
+import PacoteClasses.TaskRotina;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
 public class Editar extends javax.swing.JFrame {
     private int id;
+    private int taskId;
     private String list_name;
     private String tipo;
     private String titulo;
+    private String concluido;
     private String data_horario;
     
     public Editar() {
@@ -167,7 +171,8 @@ public class Editar extends javax.swing.JFrame {
         Confirmar();
     }//GEN-LAST:event_menu_confirmarActionPerformed
 
-    public void abrir(Editar editar, int id,String list_name, String titulo, String tipo, String opcao, String data_horario){
+    public void abrir(int SelectedId,Editar editar, int id,String list_name, String titulo, String tipo, String opcao, String data_horario){
+        List<Lista> listas = Lista.ListarLista();
         camp_titulo.setText(titulo);
         camp_tipo.setText(tipo);
         if(tipo.equals("ROTINA") && opcao.equals("s")){
@@ -186,7 +191,16 @@ public class Editar extends javax.swing.JFrame {
         setListName(list_name);
         setTitulo(titulo);
         setTipo(tipo);
+        setConcluido(opcao);
         setData_Horario(data_horario);
+        
+        for(Lista lista : listas){
+            if(lista.getId() == getId() && lista.getNome().equals(getListName())){
+                setTaskId(Lista.pegarIdTarefa(titulo, tipo, opcao, data_horario));
+                break;
+            }
+        }
+        
         
     }
     
@@ -198,12 +212,20 @@ public class Editar extends javax.swing.JFrame {
         id = _id;
     }
     
+    public void setTaskId(int _taskId){
+        taskId = _taskId;
+    }
+    
     public void setTitulo(String _titulo){
         titulo = _titulo;
     }
     
     public void setTipo(String _tipo){
         tipo = _tipo;
+    }
+    
+    public void setConcluido(String _concluido){
+        concluido = _concluido;
     }
     
     public void setData_Horario(String _data_horario){
@@ -218,12 +240,20 @@ public class Editar extends javax.swing.JFrame {
         return id;
     }
     
+    public int getTaskId(){
+        return taskId;
+    }
+    
     public String getTitulo(){
         return titulo;
     }
     
     public String getTipo(){
         return tipo;
+    }
+    
+    public String getConcluido(){
+        return concluido;
     }
     
     public String data_horario(){
@@ -258,7 +288,7 @@ public class Editar extends javax.swing.JFrame {
             for (Lista lista : listas){
                 if(lista.getNome().equals(getListName()) && lista.getId() == getId()){
                     for(Task task : tasks){
-                        if( task.getTitulo().equals(getTitulo()) && task.getTipo().equals(getTipo())){
+                        if(lista.FiltroEditar(task, getTaskId(), getTitulo(), getTipo()) && lista.getId() == getId()){
                             String horario_data;
                             if(upper.equals("COMPROMISSO")){
                                 boolean match_h = false;
@@ -283,12 +313,13 @@ public class Editar extends javax.swing.JFrame {
                             task.setTitulo(txt_titulo);
                             task.setTipo(upper);
                             task.setConcluido(opcao);
+                            //task.setId(getTaskId());
                             
-                            task.editarDados(getListName(), getTitulo(), getTipo(), txt_titulo, upper, opcao, horario_data);
+                            task.editarDados(lista, task, txt_titulo, upper, opcao, horario_data);
                             dao = new ClassDAO();
                             boolean conectar = dao.connection();
                             if(conectar == true){
-                                int status = dao.atualizarDadosTask(getListName(), getTitulo(), getTipo(), task);
+                                int status = dao.atualizarDadosTask(task);
                                 if(status == 1){
                                     System.out.println("Atualizado com sucesso!");
                                 }

@@ -213,7 +213,7 @@ public class Cadastrar extends javax.swing.JFrame {
         }else{
             try{
                 
-                int id = Lista.adicionarId();
+                int id = Lista.adicionarId("user");
                 //String txt_id = Integer.toString(id);
                 dao = new ClassDAO();
                 boolean conectado = dao.connection();
